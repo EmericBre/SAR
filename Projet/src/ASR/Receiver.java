@@ -1,28 +1,33 @@
 package ASR;
 
-import java.io.IOException;
-
 public class Receiver extends Task {
 
 	Broker broker;
 	
-	Receiver(Broker broker) {
-		this.broker = broker;
+	Receiver() {
+		this.broker = new Broker("receiver");
 	}
 	
 	public void run() {
-		Channel channel = broker.accept(8080);
-		
-		byte[] bytes = new byte[1024];
-		
+		Channel channel;
 		try {
-			channel.read(bytes, 0, bytes.length);
-		} catch (IOException e) {
+			channel = broker.accept(8080);
+			
+			byte[] bytes = new byte[1024];
+			
+			int length = channel.read(bytes, 0, 5);
+			
+			System.out.print("Message received : ");
+			for (int i = 0; i < length; i++) {
+				System.out.print((char)bytes[i]);
+			}
+			System.out.println();
+			channel.disconnect();
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		channel.disconnect();
 	}
 	
 	
