@@ -6,23 +6,22 @@ public class Sender extends Task {
 	
 	Broker broker;
 	
-	Sender(Broker broker) {
-		this.broker = broker;
+	Sender() {
+		this.broker = new Broker("sender");
 	}
 	
 	public void run() {
-		Channel channel = broker.connect("test", 8080);
-		
-		byte[] content = "test".getBytes();
-		
+		Channel channel;
 		try {
+			channel = broker.connect("receiver", 8080);
+			
+			byte[] content = "test".getBytes();
+			
 			channel.write(content, 0, content.length);
-		} catch (IOException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		channel.disconnect();
 	}
 
 }
