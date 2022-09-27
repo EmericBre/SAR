@@ -8,15 +8,15 @@ public class Main {
 
 	public static void main(String[] args) {
 				
-		Sender sender = new Sender();
-		Receiver receiver = new Receiver();
+		Sender sender = new Sender("sender");
+		Receiver receiver = new Receiver("receiver", "sender");
 		
-		sender.start();
 		receiver.start();
+		sender.start();
 		
 		try {
-			sender.join();
 			receiver.join();
+			sender.join();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -2,20 +2,14 @@ package ASR;
 
 public class CircularBuffer {
 	
-	private int bufferSize;
-	private byte[] buffer;
-	private int nextPlace;
-	private int nextLeaver;
-	private int nBits = 0;
-	private int totalBitsStored = 0;
-	private int treatedBits = 0;
+	int m_capacity;
+	int m_start, m_end;
+	byte m_elements[];
 
 	CircularBuffer(int capacity) {
-		this.bufferSize = capacity;
-		this.buffer = new byte[bufferSize];
-		this.nextPlace = 0;
-		this.nextLeaver = 0;
-		this.nBits = 0;
+		m_capacity = capacity;
+		m_elements = new byte[capacity];
+		m_start = m_end = 0;
 	}
 	
 	/**
@@ -25,7 +19,8 @@ public class CircularBuffer {
 	 * @return
 	 */
 	boolean full() {
-		return this.nBits == bufferSize;
+		int next = (m_end + 1) % m_capacity;
+		return (next == m_start);
 	}
 	
 	/**
@@ -35,7 +30,7 @@ public class CircularBuffer {
 	 * @return
 	 */
 	boolean empty() {
-		return this.nBits == 0;
+		return (m_start == m_end);
 	}
 	
 	/**
@@ -46,9 +41,11 @@ public class CircularBuffer {
 	 */
 	void put(byte bits) throws InterruptedException { // on non-full buffer
 		
-		this.buffer[nextPlace] = bits; // On ajoute le message à la prochaine place disponible
-		this.nextPlace = (nextPlace + 1)%bufferSize; // On décale l'index de la prochaine place disponible. Si on atteint la fin du buffer, on revient au début (d'où le modulo)
-		this.nBits ++; // On incrémente la variable qui stocke le nombre de messages dans le buffer à cet instant.
+		int next = (m_end + 1) % m_capacity;
+		if (next == m_start)
+			throw new IllegalStateException("Full");
+		m_elements[m_end] = bits;
+		m_end = next;
 		
 	}
 	
@@ -59,13 +56,12 @@ public class CircularBuffer {
 	 * @throws InterruptedException 
 	 */
 	byte get() throws InterruptedException { // on non-empty buffer
-		byte bits = 0;
-		
-		bits = this.buffer[nextLeaver]; // On récupère le message le plus ancien du buffer (le premier à dépiler)
-		this.buffer[nextLeaver] = 0; 
-		this.nextLeaver = (this.nextLeaver + 1)%bufferSize; // On décale l'index du prochain message à dépiler. Si on atteint la fin du buffer, on revient au début (d'où le modulo)
-		this.nBits --; // On décrémente la variable qui stocke le nombre de messages dans le buffer à cet instant.
-
-		return bits;
+		if (m_start != m_end) {
+			int next = (m_start + 1) % m_capacity;
+			byte elem = m_elements[m_start];
+			m_start = next;
+			return elem;
+		}
+		throw new IllegalStateException("Empty");
 	}
 }
