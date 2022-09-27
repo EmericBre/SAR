@@ -16,7 +16,7 @@ public class Channel {
 	
 	public Channel() {
 		this.disconnected = false;
-		this.buffer = new CircularBuffer(5);
+		this.buffer = new CircularBuffer(5); // On crée un nouveau buffer (ici de taille 5).
 	}
 
 	/**
@@ -32,7 +32,7 @@ public class Channel {
 	 * @throws IOException
 	 */
 	public int read(byte[] bytes, int offset, int length) throws IOException {
-		if (this.connectedTo.disconnected() || this.disconnected) {
+		if (this.connectedTo.disconnected() || this.disconnected) { // On verifie que la connexion est toujours ouverte des deux côtés.
 			this.connectedTo.disconnect();
 			this.disconnect();
 			throw new IOException("Channels have been disconnected");
@@ -42,13 +42,13 @@ public class Channel {
 		
 		while (counter < bytes.length-1 && counter < length-1) {
 			try {
-				while(this.buffer.empty()) {
+				while(this.buffer.empty()) { // Tant que le buffer est vide, on attend que l'autre Task écrive
 					synchronized(this) {
 						this.wait();
 					}
 				}
 				byte b = buffer.get();
-				bytes[offset+counter] = b;
+				bytes[offset+counter] = b; // On récupère le byte du buffer.
 				counter++;
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
@@ -56,7 +56,7 @@ public class Channel {
 				System.out.println("Can't get bytes");
 				return 0;
 			}
-			synchronized(this.connectedTo) {
+			synchronized(this.connectedTo) { // On notifie l'autre channel qu'une lecture a été faite (pour le réveiller si le buffer était plein)
 				this.connectedTo.notifyAll();
 			}
 		}
@@ -78,7 +78,7 @@ public class Channel {
 	 * @throws IOException
 	 */
 	public int write(byte[] bytes, int offset, int length) throws IOException {
-		if (this.connectedTo.disconnected() || this.disconnected) {
+		if (this.connectedTo.disconnected() || this.disconnected) { // On verifie que la connexion est toujours ouverte des deux côtés.
 			this.connectedTo.disconnect();
 			this.disconnect();
 			throw new IOException("Channels have been disconnected");
@@ -88,7 +88,7 @@ public class Channel {
 		
 		while (counter < length && counter < bytes.length) {
 			try {
-				while(this.connectedTo.buffer.full()) {
+				while(this.connectedTo.buffer.full()) { // Tant que le buffer est plein, on attend que l'autre Task lise
 					synchronized(this) {
 						this.wait();
 					}
@@ -98,7 +98,7 @@ public class Channel {
 					this.disconnect();
 					throw new IOException("Channels have been disconnected");
 				}
-				this.connectedTo.buffer.put(bytes[offset+counter]);
+				this.connectedTo.buffer.put(bytes[offset+counter]); // On ajoute un byte dans le buffer
 				counter++;
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
@@ -106,11 +106,11 @@ public class Channel {
 				System.out.println("Can't put bytes");
 				return 0;
 			}
-			synchronized(this.connectedTo) {
+			synchronized(this.connectedTo) { // On notifie l'autre channel qu'une écriture a été faite (pour le réveiller si le buffer était vide)
 				this.connectedTo.notifyAll();
 			}
 		}
-//		disconnect();
+
 		return counter;
 	}
 	

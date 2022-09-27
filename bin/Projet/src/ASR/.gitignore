@@ -4,3 +4,6 @@
 /Receiver.class
 /Sender.class
 /Task.class
+/CircularBuffer.class
+/TaskA.class
+/TaskB.class
