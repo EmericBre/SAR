@@ -76,7 +76,7 @@ public class ChannelImpl extends Channel {
 		if (this.connectedTo.disconnected() || this.disconnected) { // On verifie que la connexion est toujours ouverte des deux côtés.
 			this.connectedTo.disconnect();
 			this.disconnect();
-			throw new IOException("Channels have been disconnected");
+			return -1;
 		}
 		
 		int counter = 0;
@@ -91,7 +91,7 @@ public class ChannelImpl extends Channel {
 				if (this.connectedTo.disconnected() || this.disconnected) {
 					this.connectedTo.disconnect();
 					this.disconnect();
-					throw new IOException("Channels have been disconnected");
+					return -1;
 				}
 				this.connectedTo.buffer.put(bytes[offset+counter]); // On ajoute un byte dans le buffer
 				counter++;
@@ -115,6 +115,7 @@ public class ChannelImpl extends Channel {
 	 */
 	public void disconnect() {
 		this.disconnected = true;
+		connectedTo.disconnected = true;
 	}
 	
 	/**

@@ -10,12 +10,13 @@ public class Test10Threads {
 
 	public static void main(String[] args) {
 		
+		Manager manager = new Manager();
 		Client[] clients = new Client[5];
 		Server[] serveurs = new Server[5];
 		
 		for (int i = 0; i < 5; i++) {
-			serveurs[i] = new Server(Integer.toString(5+i));
-			clients[i] = new Client(Integer.toString(i),Integer.toString(5+i));
+			serveurs[i] = new Server(Integer.toString(5+i), i, manager);
+			clients[i] = new Client(Integer.toString(i),Integer.toString(5+i), i, manager);
 			serveurs[i].start();
 			clients[i].start();
 			

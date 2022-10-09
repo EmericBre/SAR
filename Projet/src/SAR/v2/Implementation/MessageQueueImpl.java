@@ -7,11 +7,11 @@ import java.util.concurrent.locks.ReentrantLock;
 public class MessageQueueImpl extends MessageQueue {
 	
 	private boolean closed;
-	private Channel channel;
+	private ChannelImpl channel;
 	private ReentrantLock sendlock;
 	private ReentrantLock receivelock;
 
-	MessageQueueImpl(Channel channel) {
+	MessageQueueImpl(ChannelImpl channel) {
 		super();
 		this.closed = false;
 		this.channel = channel;
@@ -27,11 +27,10 @@ public class MessageQueueImpl extends MessageQueue {
 			counter = this.channel.write(messageLength, 0, Integer.BYTES);
 			counter += this.channel.write(bytes, 0, length);
 			if (counter != length+Integer.BYTES) {
-				throw new IOException("The number of bytes sent is wrong.");
+				return;
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			System.out.println("Impossible to send bytes.");
 			e.printStackTrace();
 		}
 		this.sendlock.unlock();
@@ -55,19 +54,23 @@ public class MessageQueueImpl extends MessageQueue {
 			return bytes;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			System.out.println("Impossible to read bytes.");
-			e.printStackTrace();
 			this.receivelock.unlock();
+			e.printStackTrace();
 			return null;
 		}
 	}
 	
 	void close() {
 		this.closed = true;
+		this.channel.disconnect();
 	}
 	
 	boolean closed() {
 		return this.closed;
+	}
+	
+	boolean getChannelConnect() {
+		return this.channel.disconnected();
 	}
 	
 }

@@ -2,9 +2,7 @@ package SAR.v2.Test;
 
 import java.util.HashMap;
 
-import SAR.v2.Implementation.Broker;
-import SAR.v2.Implementation.Client;
-import SAR.v2.Implementation.Server;
+import SAR.v2.Implementation.*;
 
 public class Test1Server {
 
@@ -12,11 +10,12 @@ public class Test1Server {
 
 	public static void main(String[] args) throws InterruptedException {
 		
+		Manager manager = new Manager();
 		Client[] clients = new Client[10];
-		Server serveur = new Server("server");
+		Server serveur = new Server("server", 0, manager);
 		
 		for (int i = 0; i < 10; i++) {
-			clients[i] = new Client(Integer.toString(i),"server");
+			clients[i] = new Client(Integer.toString(i),"server", i, manager);
 		}
 		serveur.start();
 		

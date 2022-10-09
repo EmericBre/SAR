@@ -88,3 +88,56 @@ Get :
 
 	La méthode permet de lire un octet du buffer, puis de le supprimer du tableau.
 	Elle est synchronisée car on ne veut pas plusieurs lecteurs en même temps, en simultané.
+	
+	
+	
+################################################################################
+
+QueueBroker :
+
+Un QueueBroker est créé directement dans le constructeur d'une tâche dans lequel la connexion à un Channel est acceptée. Lors d'une connexion entre deux Tasks, les QueueBroker vont s'inter-connectés afin de permettre la création de MessageQueue, ayant pour but de transiter les messages entre les deux Threads.
+
+Accept : 
+
+	Méthode permettant d'initialiser la connexion, à partir d'un port fourni. Cela permet de créer un 		
+	nouveau MessageQueue pour une connexion entre deux Tasks.
+	Le MessageQueue correspondant au port est retourné lorsque la connexion est acceptée.
+	
+Connect :
+
+	Méthode permettant d'établir une connexion à un MessageQueue déjà initialisée par le QueueBroker courant. Il faut que le nom soit le même que celui du QueueBroker, le port également.
+	Le booléen disconnected est initialisé à false (pour Channel) car la connexion est initialisée.
+	
+	
+MessageQueue :
+
+Classe permettant d'effectuer une communication entre deux tâches via des Messages, pour la transaction de données. 
+Un MessageQueue est créé par un QueueBroker (méthode accept), et il est possible de créer d'autres instances d'un MessageQueue sémantiquement identique. 
+Ici, on appelle des Channel pour assurer la transition des messages en tant que flux d'octets à récupérer, et non en tant qu'octets individuels.
+
+Receive :
+
+	Méthode permettant de lire des paquets de bytes.
+	Assure une synchronisation entre les threads.
+	On lève une IOException dans le cas où il y a une erreur lors de la lecture des bytes, si la connexion 
+	coupe pendant la lecture.
+	
+Send :
+
+	Méthode permettant d'écrire une série de bytes
+	La série de bytes écrite pourra ensuite être lue par une task.
+	L'offset correspond à l'index de début d'écriture, length correspond à la quantité de données à écrire 
+	(en bytes).
+	On lève une IOException dans le cas où il y a une erreur lors de l'écriture des bytes, si la connexion 
+	coupe pendant l'écriture.
+	Send appelle la méthode write de Channel, qui s'occupera de bloquer l'écriture dans le cas où c'est 		nécessaire.
+	
+Close :
+
+	Méthode permettant de vérifier si le MessageQueue courant doit être gardé actif ou non.
+	Dépend de l'état du booléen closed. S'il est à true, plus aucune task ne tourne dessus, le MessageQueue 
+	doit être détruit.
+	
+Closed : 
+
+	Retourne un booléen true s'il n'y a plus aucune task active, false s'il en reste.
