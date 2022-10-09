@@ -4,8 +4,9 @@ public class Main {
 
 	public static void main(String[] args) {
 				
-		Server server = new Server("server");
-		Client client = new Client("client", "server");
+		Manager manager = new Manager();
+		Server server = new Server("server", 8080, manager);
+		Client client = new Client("client", "server", 8080, manager);
 		
 		client.start();
 		server.start();

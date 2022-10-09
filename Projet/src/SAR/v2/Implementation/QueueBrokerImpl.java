@@ -7,9 +7,9 @@ public class QueueBrokerImpl extends QueueBroker {
 	private HashMap<Integer, MessageQueueImpl> mqs;
 	private BrokerImpl broker;
 
-	 QueueBrokerImpl(String name) {
+	 QueueBrokerImpl(String name, Manager manager) {
 		 super(name);
-		 this.broker = new BrokerImpl(name);
+		 this.broker = new BrokerImpl(name, manager);
 		 this.mqs = new HashMap<Integer, MessageQueueImpl>();
 	}
 	 
