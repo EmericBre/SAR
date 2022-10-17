@@ -17,6 +17,10 @@ public class Server extends Task {
 									
 			while (!mq.closed()) {
 				byte[] message = mq.receive();
+				if (message==null) {
+					mq.close();
+					break;
+				}
 				
 				int length= (message[0]<<24)&0xff000000|
 					       (message[1]<<16)&0x00ff0000|
@@ -26,12 +30,10 @@ public class Server extends Task {
 					System.out.print((char)message[i]);
 				}
 				System.out.println();
-				
-				mq.close();
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+//			e.printStackTrace();
 			return;
 		}
 	}

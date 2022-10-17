@@ -31,9 +31,9 @@ public class MessageQueueImpl extends MessageQueue {
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			this.sendlock.unlock();
+//			e.printStackTrace();
 		}
-		this.sendlock.unlock();
 	}
 	
 	byte[] receive() {
@@ -50,12 +50,15 @@ public class MessageQueueImpl extends MessageQueue {
 				       (bytes[2]<< 8)&0x0000ff00|
 				       (bytes[3]<< 0)&0x000000ff;
 			result = this.channel.read(bytes, 4, length);
+			if (result == -1) {
+				return null;
+			}
 			this.receivelock.unlock();
 			return bytes;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			this.receivelock.unlock();
-			e.printStackTrace();
+//			e.printStackTrace();
 			return null;
 		}
 	}
@@ -71,6 +74,10 @@ public class MessageQueueImpl extends MessageQueue {
 	
 	boolean getChannelConnect() {
 		return this.channel.disconnected();
+	}
+	
+	ChannelImpl getChannel() {
+		return channel;
 	}
 	
 }

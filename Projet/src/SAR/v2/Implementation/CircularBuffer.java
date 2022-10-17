@@ -43,7 +43,7 @@ public class CircularBuffer {
 		
 		int next = (m_end + 1) % m_capacity;
 		if (next == m_start)
-			throw new IllegalStateException("Full");
+			throw new IllegalStateException();
 		m_elements[m_end] = bits;
 		m_end = next;
 		
@@ -62,6 +62,6 @@ public class CircularBuffer {
 			m_start = next;
 			return elem;
 		}
-		throw new IllegalStateException("Empty");
+		throw new IllegalStateException();
 	}
 }

@@ -22,14 +22,11 @@ public class Client extends Task {
 			while (!mq.closed()) {
 				byte[] b = name.getBytes();
 				mq.send(b, 0, b.length);
-				System.out.print(""); // Résout le problème de fermeture de connection (bancal)
-				if (mq.getChannelConnect()) {
-					mq.close();
-				}
+				mq.close();
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+//			e.printStackTrace();
 			return;
 		}
 		

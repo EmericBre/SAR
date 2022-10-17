@@ -27,17 +27,11 @@ public class ChannelImpl extends Channel {
 	 * @throws IOException
 	 */
 	public int read(byte[] bytes, int offset, int length) throws IOException {
-		if (this.connectedTo.disconnected() || this.disconnected) { // On verifie que la connexion est toujours ouverte des deux côtés.
-			this.connectedTo.disconnect();
-			this.disconnect();
-			throw new IOException("Channels have been disconnected");
-		}
-		
 		int counter = 0;
 		
 		while (counter < bytes.length && counter < length) {
 			try {
-				while(this.buffer.empty()) { // Tant que le buffer est vide, on attend que l'autre Task écrive
+				while(this.buffer.empty() && !this.connectedTo.disconnected()) { // Tant que le buffer est vide, on attend que l'autre Task écrive
 					synchronized(this) {
 						this.wait();
 					}
@@ -47,9 +41,7 @@ public class ChannelImpl extends Channel {
 				counter++;
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
-				System.out.println("Can't get bytes");
-				return 0;
+				return -1;
 			}
 			synchronized(this.connectedTo) { // On notifie l'autre channel qu'une lecture a été faite (pour le réveiller si le buffer était plein)
 				this.connectedTo.notifyAll();
@@ -73,33 +65,20 @@ public class ChannelImpl extends Channel {
 	 * @throws IOException
 	 */
 	public int write(byte[] bytes, int offset, int length) throws IOException {
-		if (this.connectedTo.disconnected() || this.disconnected) { // On verifie que la connexion est toujours ouverte des deux côtés.
-			this.connectedTo.disconnect();
-			this.disconnect();
-			return -1;
-		}
-		
 		int counter = 0;
 		
 		while (counter < length && counter < bytes.length) {
 			try {
-				while(this.connectedTo.buffer.full()) { // Tant que le buffer est plein, on attend que l'autre Task lise
+				while(this.connectedTo.buffer.full() && !this.connectedTo.disconnected()) { // Tant que le buffer est plein, on attend que l'autre Task lise
 					synchronized(this) {
 						this.wait();
 					}
-				}
-				if (this.connectedTo.disconnected() || this.disconnected) {
-					this.connectedTo.disconnect();
-					this.disconnect();
-					return -1;
 				}
 				this.connectedTo.buffer.put(bytes[offset+counter]); // On ajoute un byte dans le buffer
 				counter++;
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
-				System.out.println("Can't put bytes");
-				return 0;
+				return -1;
 			}
 			synchronized(this.connectedTo) { // On notifie l'autre channel qu'une écriture a été faite (pour le réveiller si le buffer était vide)
 				this.connectedTo.notifyAll();
@@ -116,6 +95,9 @@ public class ChannelImpl extends Channel {
 	public void disconnect() {
 		this.disconnected = true;
 		connectedTo.disconnected = true;
+		synchronized(connectedTo) {
+			notifyAll();
+		}
 	}
 	
 	/**
