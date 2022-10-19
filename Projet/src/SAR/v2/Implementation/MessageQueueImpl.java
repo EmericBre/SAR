@@ -27,16 +27,19 @@ public class MessageQueueImpl extends MessageQueue {
 			counter = this.channel.write(messageLength, 0, Integer.BYTES);
 			counter += this.channel.write(bytes, 0, length);
 			if (counter != length+Integer.BYTES) {
+				this.sendlock.unlock();
 				return;
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			this.sendlock.unlock();
 //			e.printStackTrace();
+			return;
 		}
+		this.sendlock.unlock();
 	}
 	
-	byte[] receive() {
+	byte[] receive() throws InterruptedException {
 		this.receivelock.lock();
 		byte[] bytes = new byte[64];
 		
@@ -51,6 +54,7 @@ public class MessageQueueImpl extends MessageQueue {
 				       (bytes[3]<< 0)&0x000000ff;
 			result = this.channel.read(bytes, 4, length);
 			if (result == -1) {
+				this.receivelock.unlock();
 				return null;
 			}
 			this.receivelock.unlock();
@@ -64,16 +68,18 @@ public class MessageQueueImpl extends MessageQueue {
 	}
 	
 	void close() {
-		this.closed = true;
 		this.channel.disconnect();
+		synchronized(channel) {
+			channel.notifyAll();
+		}
+		ChannelImpl connectedTo = channel.getConnectedTo();
+		synchronized(connectedTo) {
+			connectedTo.notifyAll();
+		}
 	}
 	
 	boolean closed() {
-		return this.closed;
-	}
-	
-	boolean getChannelConnect() {
-		return this.channel.disconnected();
+		return channel.disconnected();
 	}
 	
 	ChannelImpl getChannel() {

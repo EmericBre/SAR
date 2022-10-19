@@ -14,7 +14,7 @@ public class Server extends Task {
 		MessageQueue mq;
 		try {
 			mq = broker.accept(port); // On accepte la connexion
-									
+				
 			while (!mq.closed()) {
 				byte[] message = mq.receive();
 				if (message==null) {

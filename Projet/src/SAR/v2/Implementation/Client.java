@@ -22,6 +22,7 @@ public class Client extends Task {
 			while (!mq.closed()) {
 				byte[] b = name.getBytes();
 				mq.send(b, 0, b.length);
+				Thread.sleep(1);
 				mq.close();
 			}
 		} catch (Exception e) {
