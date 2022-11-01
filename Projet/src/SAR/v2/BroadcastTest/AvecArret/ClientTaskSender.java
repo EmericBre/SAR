@@ -1,4 +1,4 @@
-package SAR.v2.BroadcastTest;
+package SAR.v2.BroadcastTest.AvecArret;
 
 import java.util.HashMap;
 
@@ -45,6 +45,5 @@ public class ClientTaskSender extends Task {
 //			e.printStackTrace();
 			return;
 		}
-		broker.freeUnusedPorts(port);
 	}
 }

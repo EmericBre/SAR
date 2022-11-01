@@ -15,7 +15,7 @@ public abstract class Broker {
 	 * @return
 	 * @throws InterruptedException 
 	 */
-	abstract Channel accept(int port) throws InterruptedException;
+	public abstract Channel accept(QueueBroker broker, int port) throws InterruptedException;
 	
 	/**
 	 * Méthode permettant d'établir une connexion à un Channel déjà initialisée par le Broker courant. Il faut que le nom soit le même que celui du Broker, le port également.
@@ -25,5 +25,5 @@ public abstract class Broker {
 	 * @return
 	 * @throws InterruptedException 
 	 */
-	abstract Channel connect(String name, int port) throws InterruptedException;
+	public abstract Channel connect(QueueBroker broker, String name, int port) throws InterruptedException;
 }

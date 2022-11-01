@@ -1,4 +1,6 @@
-package SAR.v2.Implementation;
+package SAR.v2.Test.AvecArret;
+
+import SAR.v2.Implementation.Manager;
 
 public class Main {
 

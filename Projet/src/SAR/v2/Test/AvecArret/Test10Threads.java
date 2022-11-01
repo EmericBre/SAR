@@ -1,4 +1,4 @@
-package SAR.v2.Test;
+package SAR.v2.Test.AvecArret;
 
 import java.util.HashMap;
 

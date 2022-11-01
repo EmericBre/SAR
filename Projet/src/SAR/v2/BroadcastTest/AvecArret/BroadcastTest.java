@@ -1,4 +1,4 @@
-package SAR.v2.BroadcastTest;
+package SAR.v2.BroadcastTest.AvecArret;
 
 import SAR.v2.Implementation.*;
 
@@ -15,7 +15,7 @@ public class BroadcastTest {
 				clients[i] = new ClientTaskSender(Integer.toString(i),Integer.toString(i-1), i-1, manager);
 			}
 			else {
-				clients[i] = new ClientTaskReceiver(Integer.toString(i),"serveur", i, manager);
+				clients[i] = new ClientTaskReceiver(Integer.toString(i), i, manager);
 			}
 			clients[i].start();
 		}

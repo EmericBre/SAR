@@ -1,24 +1,22 @@
-package SAR.v2.BroadcastTest;
+package SAR.v2.BroadcastTest.SansArret;
 
 import SAR.v2.Implementation.*;
 
 public class ClientTaskReceiver extends Task {
 
 	String name;
-	QueueBrokerImpl broker;
-	String toConnect;
+	QueueBroker broker;
 	int port;
 	
-	public ClientTaskReceiver(String name, String toConnect, int port, Manager manager) {
+	public ClientTaskReceiver(String name, int port, Manager manager) {
 		this.name = name;
-		this.toConnect = toConnect;
 		this.broker = new QueueBrokerImpl(name, manager);
 		this.port = port;
 	}
 	
 	public void run() {
-		MessageQueueImpl mq = null;
-		while (mq == null || !mq.closed()) {
+		MessageQueue mq = null;
+		while (true) {
 			synchronized(ClientTaskSender.queues) {
 				while(!ClientTaskSender.queues.containsKey(name)) {
 					try {
@@ -44,6 +42,5 @@ public class ClientTaskReceiver extends Task {
 				return;
 			}
 		}
-		broker.freeUnusedPorts(port);
 	}
 }

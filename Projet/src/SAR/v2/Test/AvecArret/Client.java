@@ -1,4 +1,9 @@
-package SAR.v2.Implementation;
+package SAR.v2.Test.AvecArret;
+
+import SAR.v2.Implementation.Manager;
+import SAR.v2.Implementation.MessageQueueImpl;
+import SAR.v2.Implementation.QueueBrokerImpl;
+import SAR.v2.Implementation.Task;
 
 public class Client extends Task {
 

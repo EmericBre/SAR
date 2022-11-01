@@ -1,11 +1,9 @@
-package SAR.v2.Test;
+package SAR.v2.Test.AvecArret;
 
 import java.util.HashMap;
 
 import SAR.v2.Implementation.Broker;
-import SAR.v2.Implementation.Client;
 import SAR.v2.Implementation.Manager;
-import SAR.v2.Implementation.Server;
 
 public class Test1000Threads {
 

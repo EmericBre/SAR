@@ -2,7 +2,7 @@ package SAR.v3.Test;
 
 import java.util.HashMap;
 
-import SAR.v2.Implementation.*;
+import SAR.v3.Implementation.*;
 
 public class Test10Threads {
 		
