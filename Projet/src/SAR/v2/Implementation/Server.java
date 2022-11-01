@@ -22,14 +22,10 @@ public class Server extends Task {
 					break;
 				}
 				
-				int length= (message[0]<<24)&0xff000000|
-					       (message[1]<<16)&0x00ff0000|
-					       (message[2]<< 8)&0x0000ff00|
-					       (message[3]<< 0)&0x000000ff;
-				for (int i = 4; i < 4+length; i++) {
-					System.out.print((char)message[i]);
+				for (int j = 0; j < message.length; j++) {
+					System.out.print((char)message[j]);
 				}
-				System.out.println();
+				System.out.println("");
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

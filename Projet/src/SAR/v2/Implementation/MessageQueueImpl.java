@@ -19,7 +19,7 @@ public class MessageQueueImpl extends MessageQueue {
 		this.sendlock = new ReentrantLock();
 	}
 	
-	void send(byte[] bytes, int offset, int length) {
+	public void send(byte[] bytes, int offset, int length) {
 		this.sendlock.lock();
 		byte[] messageLength = ByteBuffer.allocate(Integer.BYTES).putInt(length).array();
 		int counter = 0;
@@ -39,7 +39,7 @@ public class MessageQueueImpl extends MessageQueue {
 		this.sendlock.unlock();
 	}
 	
-	byte[] receive() throws InterruptedException {
+	public byte[] receive() throws InterruptedException {
 		this.receivelock.lock();
 		byte[] bytes = new byte[64];
 		
@@ -52,13 +52,14 @@ public class MessageQueueImpl extends MessageQueue {
 				       (bytes[1]<<16)&0x00ff0000|
 				       (bytes[2]<< 8)&0x0000ff00|
 				       (bytes[3]<< 0)&0x000000ff;
-			result = this.channel.read(bytes, 4, length);
+			byte[] message = new byte[length];
+			result = this.channel.read(message, 0, length);
 			if (result == -1) {
 				this.receivelock.unlock();
 				return null;
 			}
 			this.receivelock.unlock();
-			return bytes;
+			return message;
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			this.receivelock.unlock();
@@ -67,7 +68,7 @@ public class MessageQueueImpl extends MessageQueue {
 		}
 	}
 	
-	void close() {
+	public void close() {
 		this.channel.disconnect();
 		synchronized(channel) {
 			channel.notifyAll();
@@ -78,11 +79,11 @@ public class MessageQueueImpl extends MessageQueue {
 		}
 	}
 	
-	boolean closed() {
+	public boolean closed() {
 		return channel.disconnected();
 	}
 	
-	ChannelImpl getChannel() {
+	public ChannelImpl getChannel() {
 		return channel;
 	}
 	
