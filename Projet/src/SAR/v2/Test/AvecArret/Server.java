@@ -1,4 +1,10 @@
-package SAR.v2.Implementation;
+package SAR.v2.Test.AvecArret;
+
+import SAR.v2.Implementation.Manager;
+import SAR.v2.Implementation.MessageQueue;
+import SAR.v2.Implementation.QueueBroker;
+import SAR.v2.Implementation.QueueBrokerImpl;
+import SAR.v2.Implementation.Task;
 
 public class Server extends Task {
 	

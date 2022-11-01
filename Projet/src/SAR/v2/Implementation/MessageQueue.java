@@ -4,12 +4,12 @@ public abstract class MessageQueue {
 
 	MessageQueue() {}
 	
-	abstract void send(byte[] bytes, int offset, int length);
+	public abstract void send(byte[] bytes, int offset, int length);
 	
-	abstract byte[] receive() throws InterruptedException;
+	public abstract byte[] receive() throws InterruptedException;
 	
-	abstract void close();
+	public abstract void close();
 	
-	abstract boolean closed();
+	public abstract boolean closed();
 	 
 }

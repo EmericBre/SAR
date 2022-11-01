@@ -1,8 +1,9 @@
-package SAR.v3.Test;
+package SAR.v2.Test.SansArret;
 
 import java.util.HashMap;
 
-import SAR.v3.Implementation.*;
+import SAR.v2.Implementation.Broker;
+import SAR.v2.Implementation.Manager;
 
 public class Test1000Threads {
 
@@ -17,7 +18,9 @@ public class Test1000Threads {
 			clients[i] = new Client(Integer.toString(i),Integer.toString(500+i), i, manager);
 			serveurs[i].start();
 			clients[i].start();
-			
+		}
+		
+		for (int i = 0; i < 500; i++) {
 			try {
 				clients[i].join();
 				serveurs[i].join();

@@ -13,7 +13,6 @@ public class BrokerImpl extends Broker {
 		this.name = name;
 		this.open = new HashMap<Integer, ChannelImpl>();
 		this.manager = manager;
-		this.manager.addBroker(name, this); // On ajoute ce nouveau Broker à la liste des Broker de l'application
 	}
 	
 	/**
@@ -23,12 +22,12 @@ public class BrokerImpl extends Broker {
 	 * @return
 	 * @throws InterruptedException 
 	 */
-	synchronized ChannelImpl accept(int port) throws InterruptedException {
+	public synchronized ChannelImpl accept(QueueBroker broker, int port) throws InterruptedException {
 		if (this.open.containsKey(port)) { // On vérifie que le port ne soit pas déjà utilisé pour une autre connexion
 			throw new InterruptedException("Port " + port + " is already in use (either open or waiting for a connection");
 		}
 		
-		ChannelImpl channelaccept = manager.accept(this, port);
+		ChannelImpl channelaccept = manager.accept((QueueBrokerImpl)broker, port);
 
 		this.open.put(port, channelaccept);
 
@@ -45,9 +44,9 @@ public class BrokerImpl extends Broker {
 	 * @return
 	 * @throws InterruptedException 
 	 */
-	synchronized ChannelImpl connect(String name, int port) throws InterruptedException {
+	public synchronized ChannelImpl connect(QueueBroker broker, String name, int port) throws InterruptedException {
 		
-		ChannelImpl channelconnect = manager.connect(this, name, port);
+		ChannelImpl channelconnect = manager.connect((QueueBrokerImpl)broker, name, port);
 
 		this.open.put(port, channelconnect); // On ajoute la connexion à ce broker.
 		

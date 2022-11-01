@@ -1,4 +1,4 @@
-package SAR.v2.BroadcastTest;
+package SAR.v2.BroadcastTest.AvecArret;
 
 import java.util.HashMap;
 
@@ -62,7 +62,6 @@ public class ServerTask extends Task{
 			if(i%2==0) {
 				serveurqueues.get(i).close();
 				serveurqueues.remove(i);
-				broker.freeUnusedPorts(i);
 			}
 		}
 	}
