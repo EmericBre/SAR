@@ -5,7 +5,7 @@ import java.util.HashMap;
 public class BrokerImpl extends Broker {
 	
 	private String name;
-	private HashMap<Integer, ChannelImpl> open; // Liste stockant les ports ayant une connexion ouverte, et la Channel liée
+	public HashMap<Integer, ChannelImpl> open; // Liste stockant les ports ayant une connexion ouverte, et la Channel liée
 	private Manager manager;
 	
 	BrokerImpl(String name, Manager manager) {
