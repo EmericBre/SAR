@@ -23,7 +23,7 @@ public class Server extends Task {
 	public void run() {
 		while(true) {
 			synchronized(this.manager) {
-				this.manager.freeUnusedPorts();
+				this.manager.freeUnusedPorts(); // On supprime les connexions inactives.
 			}
 			MessageQueue mq;
 			try {
@@ -31,20 +31,19 @@ public class Server extends Task {
 				
 				byte[] message = mq.receive();
 				
-				if (message != null) {
-					synchronized(System.out) {
+				if (message != null) { // Si le message n'a pas été lu, on sort de la boucle.
+					synchronized(System.out) { // On synchronise pour éviter que plusieurs threads puissent écrire en même temps.
 						System.out.print("Serveur " + this.name + " lit : ");
-						for (int j = 0; j < message.length; j++) {
+						for (int j = 0; j < message.length; j++) { // On lit le message octet par octet.
 							System.out.print((char)message[j]);
 						}
 						System.out.println("");
 					}
 				}
 				
-				mq.close();
+				mq.close(); // On ferme la connexion
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
-	//			e.printStackTrace();
 				return;
 			}
 		}
