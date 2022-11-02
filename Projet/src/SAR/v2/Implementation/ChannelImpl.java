@@ -44,7 +44,7 @@ public class ChannelImpl extends Channel {
 					}
 				}
 				byte b;
-				synchronized(buffer) {
+				synchronized(buffer) { // On synchronise le buffer pour qu'il ne soit pas possible de lire et écrire en même temps.
 					b = buffer.get();
 				}
 				bytes[offset+counter] = b; // On récupère le byte du buffer.
@@ -98,7 +98,7 @@ public class ChannelImpl extends Channel {
 						this.wait();
 					}
 				}
-				synchronized(this.connectedTo.buffer) {
+				synchronized(this.connectedTo.buffer) { // On synchronise le buffer pour qu'il ne soit pas possible de lire et écrire en même temps
 					this.connectedTo.buffer.put(bytes[offset+counter]); // On ajoute un byte dans le buffer					
 				}
 				counter++;
@@ -116,7 +116,7 @@ public class ChannelImpl extends Channel {
 	
 	/**
 	 * Méthode permettant de vérifier si la Channel courante doit être gardée active ou non.
-	 * Dépend de l'état du booléen disconnected. S'il est à true, plus aucune task ne tourne dessus, le Channel doit être détruit.
+	 * Déconnecte la channel courante et la channel connectée.
 	 */
 	public void disconnect() {
 		this.disconnected = true;
@@ -139,6 +139,10 @@ public class ChannelImpl extends Channel {
 		this.connectedTo = external;
 	}
 	
+	/**
+	 * Retourne la channel de la task à laquelle on est connectée.
+	 * @return
+	 */
 	public ChannelImpl getConnectedTo() {
 		return this.connectedTo;
 	}

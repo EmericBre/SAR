@@ -24,15 +24,14 @@ public class Client extends Task {
 		try {
 			mq = broker.connect(toConnect, port); // On crée une nouvelle connexion
 			
-			while (!mq.closed()) {
+			while (!mq.closed()) { // Tant que la connexion est ouverte, on écrit le nom.
 				byte[] b = name.getBytes();
 				mq.send(b, 0, b.length);
 				Thread.sleep(1);
-				mq.close();
+				mq.close(); // On ferme la connexion.
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-//			e.printStackTrace();
 			return;
 		}
 		

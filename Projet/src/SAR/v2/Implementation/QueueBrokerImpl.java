@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 public class QueueBrokerImpl extends QueueBroker {
 	
-	private HashMap<Integer, MessageQueueImpl> mqs;
+	private HashMap<Integer, MessageQueueImpl> mqs; // Liste des MessageQueues du Broker actuel avec leur port.
 	private BrokerImpl broker;
 	private Manager manager;
 
@@ -16,6 +16,11 @@ public class QueueBrokerImpl extends QueueBroker {
 		 this.manager.addBroker(name, this); // On ajoute ce nouveau Broker à la liste des Broker de l'application
 	}
 	 
+	/**
+	 * Méthode permettant d'accepter une connexion.
+	 * Lorsque la channel est récupérée, on crée une MessageQueue à partir de celle-ci et on l'ajoute dans la liste (avec son port).
+	 * On retourne la MessageQueue obtenue.
+	 */
 	public MessageQueueImpl accept(int port) {
 		try {
 			ChannelImpl channel = this.broker.accept(this, port);
@@ -30,6 +35,12 @@ public class QueueBrokerImpl extends QueueBroker {
 		}
 	}
 	 
+	/**
+	 * Méthode permettant de se connecter à un autre Broker.
+	 * Lorsque la channel est récupérée, on crée une MessageQueue à partir de celle-ci et on l'ajoute dans la liste (avec son port).
+	 * On retourne la MessageQueue obtenue.
+	 * Si une MessageQueue existe déjà pour le Broker et le port souhaité, on la retourne directement.
+	 */
 	public MessageQueueImpl connect(String name, int port) {
 		try {
 			if (mqs.containsKey(port)) {
@@ -47,10 +58,18 @@ public class QueueBrokerImpl extends QueueBroker {
 		}
 	}
 	
+	/**
+	 * On retourne le Broker correspondant.
+	 * @return
+	 */
 	public BrokerImpl getBroker() {
 		return broker;
 	}
 	
+	/**
+	 * On retourne la liste des MessageQueues actives.
+	 * @return
+	 */
 	public HashMap<Integer, MessageQueueImpl> getMqs() {
 		return mqs;
 	}

@@ -26,8 +26,8 @@ public class ClientTaskSender extends Task {
 			while (true) {
 				mq = broker.connect("serveur", port); // On crée une nouvelle connexion
 				
-				synchronized(queues) {
-					if (!queues.containsKey(toConnect)) {
+				synchronized(queues) { // On synchronise la queue pour qu'il n'y ai pas plusieurs ajouts en même temps.
+					if (!queues.containsKey(toConnect)) { // Si la connexion n'est pas déjà existante, on l'ajoute dans la liste.
 						queues.put(toConnect, mq);
 						queues.notifyAll();
 					}
@@ -36,13 +36,12 @@ public class ClientTaskSender extends Task {
 				byte[] b = name.getBytes();
 				mq.send(b, 0, b.length);
 				Thread.sleep(1);
-				synchronized(queues) {
+				synchronized(queues) { // On supprime la connexion de la queue.
 					queues.remove(toConnect);
 				}
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-//			e.printStackTrace();
 			return;
 		}
 	}

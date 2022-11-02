@@ -21,21 +21,20 @@ public class Server extends Task {
 		try {
 			mq = broker.accept(port); // On accepte la connexion
 				
-			while (!mq.closed()) {
+			while (!mq.closed()) { // Tant que la connexion est ouverte, on lit le message.
 				byte[] message = mq.receive();
-				if (message==null) {
+				if (message==null) { // Si le message n'a pas été lu, on ferme la connexion et on sort de la boucle.
 					mq.close();
 					break;
 				}
 				
-				for (int j = 0; j < message.length; j++) {
+				for (int j = 0; j < message.length; j++) { // On lit le message octet par octet.
 					System.out.print((char)message[j]);
 				}
 				System.out.println("");
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-//			e.printStackTrace();
 			return;
 		}
 	}
