@@ -141,3 +141,10 @@ Close :
 Closed : 
 
 	Retourne un booléen true s'il n'y a plus aucune task active, false s'il en reste.
+	
+	
+################################################################################
+	
+Voir documentations dans le code pour le détail de l'explication des méthodes (v2 + v3 pour broadcast et event).
+
+################################################################################
