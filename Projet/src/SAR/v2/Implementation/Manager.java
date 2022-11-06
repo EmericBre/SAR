@@ -122,7 +122,7 @@ public class Manager {
 	 * Dans le cas où on veut faire plusieurs connexions entre des Brokers sur le même port, il faut s'assurer que le port puisse être disponible s'il n'y a aucune connexion ouverte dessus.
 	 * On regarde pour chaque Broker ses connexions actives, et on vérifie l'état du booléen disconnected du Channel.
 	 */
-	public void freeUnusedPorts() {
+	public synchronized void freeUnusedPorts() {
 		HashMap<QueueBrokerImpl, ArrayList<Integer>> toRemove = new HashMap<QueueBrokerImpl, ArrayList<Integer>>();
 		for (HashMap.Entry<String, QueueBrokerImpl> entry : BrokerManager.entrySet()) { // Pour chaque Broker enregistré.
 			QueueBrokerImpl b = entry.getValue();

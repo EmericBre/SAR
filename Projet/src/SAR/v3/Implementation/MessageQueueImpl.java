@@ -1,101 +1,75 @@
 package SAR.v3.Implementation;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.util.concurrent.locks.ReentrantLock;
+
+import SAR.v3.Event.*;
 
 public class MessageQueueImpl extends MessageQueue {
 	
-	private boolean closed;
-	private ChannelImpl channel;
-	private ReentrantLock sendlock;
-	private ReentrantLock receivelock;
+	private Channel channel;
+	private Executor executor;
+	private Listener listener;
 
-	MessageQueueImpl(ChannelImpl channel) {
+	public MessageQueueImpl(Channel channel, Executor executor) {
 		super();
-		this.closed = false;
 		this.channel = channel;
-		this.receivelock = new ReentrantLock();
-		this.sendlock = new ReentrantLock();
+		this.executor = executor;
 	}
 	
-	void send(byte[] bytes, int offset, int length) {
-		this.sendlock.lock();
-		byte[] messageLength = ByteBuffer.allocate(Integer.BYTES).putInt(length).array();
-		int counter = 0;
-		try {
-			counter = this.channel.write(messageLength, 0, Integer.BYTES);
-			counter += this.channel.write(bytes, 0, length);
-			if (counter != length+Integer.BYTES) {
-				return;
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			this.sendlock.unlock();
-//			e.printStackTrace();
+	/**
+	 * Méthode appelant l'event de fermeture de la connexion.
+	 */
+	public void close() {
+		executor.push(new CloseEvent(executor, channel, listener));
+	}
+	
+	/**
+	 * Retourne l'état de la channel, qui est le même que celui de la MessageQueue.
+	 */
+	public boolean closed() {
+		return channel.disconnected();
+	}
+	
+	/**
+	 * Retourne la Channel associée à la MessageQueue.
+	 * @return
+	 */
+	public ChannelImpl getChannel() {
+		return (ChannelImpl)channel;
+	}
+
+	/**
+	 * Ajout d'un listener sur la Channel pour réagir aux différentes actions.
+	 */
+	@Override
+	public void setListener(Listener l) {
+		// TODO Auto-generated method stub
+		this.listener = l;
+		ListenerManager.getInstance().add(channel, listener);
+	}
+
+	/**
+	 * Méthode permettant d'envoyer une série d'octets
+	 */
+	@Override
+	public boolean send(byte[] bytes) {
+		// TODO Auto-generated method stub
+		return send(bytes, 0, bytes.length);
+	}
+
+	/**
+	 * Méthode remplaçant le send de la v2.
+	 * Vérifie que la connexion est ouverte.
+	 * Crée un event pour envoyer les données en paramètres.
+	 */
+	@Override
+	public boolean send(byte[] bytes, int offset, int length) {
+		// TODO Auto-generated method stub
+		if (closed()) {
+			return false;
 		}
-	}
-	
-	byte[] receive() {
-		this.receivelock.lock();
-		byte[] bytes = new byte[64];
-		
-		try {
-			int result = this.channel.read(bytes, 0, Integer.BYTES);
-			if (result != Integer.BYTES) {
-				throw new IOException("Impossible to read message length");
-			}
-			int length= (bytes[0]<<24)&0xff000000|
-				       (bytes[1]<<16)&0x00ff0000|
-				       (bytes[2]<< 8)&0x0000ff00|
-				       (bytes[3]<< 0)&0x000000ff;
-			result = this.channel.read(bytes, 4, length);
-			if (result == -1) {
-				return null;
-			}
-			this.receivelock.unlock();
-			return bytes;
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			this.receivelock.unlock();
-//			e.printStackTrace();
-			return null;
-		}
-	}
-	
-	void close() {
-		this.closed = true;
-		this.channel.disconnect();
-	}
-	
-	boolean closed() {
-		return this.closed;
-	}
-	
-	boolean getChannelConnect() {
-		return this.channel.disconnected();
-	}
-	
-	ChannelImpl getChannel() {
-		return channel;
-	}
-
-	@Override
-	void setListener(Listener l) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	boolean send(byte[] bytes, Object cookie) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	boolean send(byte[] bytes, int offset, int length, Object cookie) {
-		// TODO Auto-generated method stub
-		return false;
+		executor.push(new SendEvent(executor, bytes, offset, length, channel, listener));
+		return true;
 	}
 	
 }

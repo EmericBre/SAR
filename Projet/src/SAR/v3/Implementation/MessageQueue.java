@@ -4,24 +4,16 @@ public abstract class MessageQueue {
 
 	MessageQueue() {}
 	
-	interface Listener {
+	public interface Listener {
 		void received(byte[] msg);
-		void sent(byte[] bytes, int offset, int length, Object cookie);
+		void sent(byte[] bytes, int offset, int length);
 		void closed();
 	}
-	abstract void setListener(Listener l);
+	public abstract void setListener(Listener l);
 	
-	abstract boolean send(byte[] bytes, Object cookie);
-	abstract boolean send(byte[] bytes, int offset, int length, Object cookie);
-	abstract void close();
-	abstract boolean closed();
-	
-//	abstract void send(byte[] bytes, int offset, int length);
-//	
-//	abstract byte[] receive();
-//	
-//	abstract void close();
-//	
-//	abstract boolean closed();
+	public abstract boolean send(byte[] bytes);
+	public abstract boolean send(byte[] bytes, int offset, int length);
+	public abstract void close();
+	public abstract boolean closed();
 	 
 }

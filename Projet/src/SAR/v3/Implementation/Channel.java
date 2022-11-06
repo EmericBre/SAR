@@ -23,8 +23,9 @@ public abstract class Channel {
 	 * @param length
 	 * @return
 	 * @throws IOException
+	 * @throws InterruptedException 
 	 */
-	public abstract int read(byte[] bytes, int offset, int length) throws IOException;
+	public abstract int read(byte[] bytes, int offset, int length) throws IOException, InterruptedException;
 	
 	/**
 	 * Méthode permettant d'écrire une série de bytes

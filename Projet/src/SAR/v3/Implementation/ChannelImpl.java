@@ -25,22 +25,40 @@ public class ChannelImpl extends Channel {
 	 * @param length
 	 * @return
 	 * @throws IOException
+	 * @throws InterruptedException 
 	 */
-	public int read(byte[] bytes, int offset, int length) throws IOException {
+	public int read(byte[] bytes, int offset, int length) throws IOException, InterruptedException {
 		int counter = 0;
 		
 		while (counter < bytes.length && counter < length) {
 			try {
-				while(this.buffer.empty() && !this.connectedTo.disconnected()) { // Tant que le buffer est vide, on attend que l'autre Task écrive
-					synchronized(this) {
+				if (this.disconnected) {
+					throw new IOException();
+				}
+				synchronized(this) {
+					while(this.buffer.empty()) { // Tant que le buffer est vide, on attend que l'autre Task écrive
+						if (this.disconnected) {
+							throw new IOException();
+						}
 						this.wait();
 					}
 				}
-				byte b = buffer.get();
+				byte b;
+				synchronized(buffer) { // On synchronise le buffer pour qu'il ne soit pas possible de lire et écrire en même temps.
+					b = buffer.get();
+				}
 				bytes[offset+counter] = b; // On récupère le byte du buffer.
 				counter++;
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
+				synchronized(buffer) {
+					byte b;
+					while(!buffer.empty()) {
+						b = buffer.get();
+						bytes[offset+counter] = b; // On récupère le byte du buffer.
+						counter++;
+					}
+				}
 				return -1;
 			}
 			synchronized(this.connectedTo) { // On notifie l'autre channel qu'une lecture a été faite (pour le réveiller si le buffer était plein)
@@ -67,14 +85,22 @@ public class ChannelImpl extends Channel {
 	public int write(byte[] bytes, int offset, int length) throws IOException {
 		int counter = 0;
 		
-		while (counter < length && counter < bytes.length) {
+		while (counter < length) {
 			try {
-				while(this.connectedTo.buffer.full() && !this.connectedTo.disconnected()) { // Tant que le buffer est plein, on attend que l'autre Task lise
-					synchronized(this) {
+				if (this.disconnected) {
+					throw new IOException();
+				}
+				synchronized(this) {
+					while(this.connectedTo.buffer.full()) { // Tant que le buffer est plein, on attend que l'autre Task lise
+						if (this.disconnected) {
+							throw new IOException();
+						}
 						this.wait();
 					}
 				}
-				this.connectedTo.buffer.put(bytes[offset+counter]); // On ajoute un byte dans le buffer
+				synchronized(this.connectedTo.buffer) { // On synchronise le buffer pour qu'il ne soit pas possible de lire et écrire en même temps
+					this.connectedTo.buffer.put(bytes[offset+counter]); // On ajoute un byte dans le buffer					
+				}
 				counter++;
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
@@ -90,14 +116,11 @@ public class ChannelImpl extends Channel {
 	
 	/**
 	 * Méthode permettant de vérifier si la Channel courante doit être gardée active ou non.
-	 * Dépend de l'état du booléen disconnected. S'il est à true, plus aucune task ne tourne dessus, le Channel doit être détruit.
+	 * Déconnecte la channel courante et la channel connectée.
 	 */
 	public void disconnect() {
 		this.disconnected = true;
 		connectedTo.disconnected = true;
-		synchronized(connectedTo) {
-			notifyAll();
-		}
 	}
 	
 	/**
@@ -114,5 +137,13 @@ public class ChannelImpl extends Channel {
 	 */
 	public void connectTo(ChannelImpl external) {
 		this.connectedTo = external;
+	}
+	
+	/**
+	 * Retourne la channel de la task à laquelle on est connectée.
+	 * @return
+	 */
+	public ChannelImpl getConnectedTo() {
+		return this.connectedTo;
 	}
 }

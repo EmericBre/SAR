@@ -16,3 +16,6 @@
 /QueueBroker$AcceptListener.class
 /QueueBroker$ConnectListener.class
 /MessageQueue$Listener.class
+/Executor.class
+/Event.class
+/ListenerManager.class
